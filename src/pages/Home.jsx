@@ -1,234 +1,123 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { color, font, radius, shadow, statusBadge, accessTag } from '../styles/tokens';
-import { categories } from '../data/categories';
+import { Link } from "react-router-dom";
+import { categories } from "../data/categories";
+import CategorySection from "../components/CategorySection";
+import { color, font } from "../styles/tokens";
 
-// The provided asset URL
-const LOGO_URL = "https://z-cdn-media.chatglm.cn/files/82fbc0ab-28d1-4082-bdd0-310a550dabd0.png?auth_key=1882618439-128a6150cf2844818a1c390067b289ca-0-c761b14604296def7cc2443e4b1a9d4d";
+const pageStyle = {
+  minHeight: "100vh",
+  background: color.duskInk,
+  paddingBottom: "3rem",
+};
 
-function Logo({ size = 28 }) {
+const grainStyle = {
+  position: "fixed",
+  top: "-50%",
+  left: "-50%",
+  width: "200%",
+  height: "200%",
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+  opacity: 0.035,
+  pointerEvents: "none",
+  zIndex: 0,
+  animation: "shhh-grain-drift 24s ease-in-out infinite",
+};
+
+const heroStyle = {
+  position: "relative",
+  padding: "3rem 1.5rem 2.5rem",
+  textAlign: "center",
+  overflow: "hidden",
+};
+
+const blobBase = {
+  position: "absolute",
+  width: "160px",
+  height: "160px",
+  borderRadius: "50%",
+  filter: "blur(50px)",
+  animation: "shhh-breathe 8s ease-in-out infinite",
+  pointerEvents: "none",
+};
+
+const tealBlobStyle = { ...blobBase, background: color.signalTeal, top: "0", left: "15%" };
+const lavenderBlobStyle = {
+  ...blobBase,
+  background: color.hushLavender,
+  top: "20px",
+  right: "15%",
+  animationDelay: "2s",
+};
+
+const contentStyle = { position: "relative", zIndex: 1 };
+
+const titleStyle = {
+  fontFamily: font.display,
+  fontWeight: 200,
+  fontSize: "clamp(2.2rem, 9vw, 3.4rem)",
+  color: color.fogWhite,
+  margin: 0,
+  letterSpacing: "-0.02em",
+};
+
+const subtitleStyle = {
+  fontFamily: font.body,
+  fontWeight: 300,
+  fontSize: "0.95rem",
+  color: color.fogWhiteMuted,
+  marginTop: "0.6rem",
+  letterSpacing: "0.03em",
+  maxWidth: "30ch",
+  marginLeft: "auto",
+  marginRight: "auto",
+};
+
+const submitLinkStyle = {
+  display: "inline-block",
+  marginTop: "1.25rem",
+  fontFamily: font.mono,
+  fontSize: "0.8rem",
+  color: color.signalTeal,
+  textDecoration: "none",
+  border: `1px solid ${color.signalTealSoft}`,
+  borderRadius: "999px",
+  padding: "0.4rem 0.9rem",
+};
+
+const sectionsWrapStyle = {
+  position: "relative",
+  zIndex: 1,
+  padding: "0 1rem",
+  maxWidth: "960px",
+  margin: "0 auto",
+};
+
+export default function Home() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-      <img 
-        src={LOGO_URL} 
-        alt="Shhh.Space Logo" 
-        style={{ height: size, width: 'auto' }} 
-      />
-      {size > 24 && (
-        <span style={{
-          fontFamily: font.display,
-          fontWeight: 700,
-          fontSize: '1.1rem',
-          color: color.fogWhite,
-          letterSpacing: '-0.02em'
-        }}>
-          Shhh<span style={{ color: color.signalTeal }}>.</span>Space
-        </span>
-      )}
-    </div>
-  );
-}
+    <div style={pageStyle}>
+      <div style={grainStyle} />
 
-function Navbar({ onOpenPricing }) {
-  const navigate = useNavigate();
-  const [isPressed, setIsPressed] = useState(null);
-
-  const btnStyle = (id) => ({
-    background: 'transparent', 
-    border: `1px solid ${isPressed === id ? color.signalTeal : color.smokeGlassBorder}`, 
-    color: isPressed === id ? color.signalTeal : color.fogWhiteMuted,
-    padding: '8px 14px', 
-    borderRadius: radius.pill, 
-    cursor: 'pointer',
-    fontFamily: font.mono, 
-    fontSize: '0.7rem', 
-    letterSpacing: '0.05em',
-    transition: 'border-color 0.2s ease, color 0.2s ease', 
-    minHeight: '44px', 
-    display: 'flex', 
-    alignItems: 'center'
-  });
-
-  return (
-    <header style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      backgroundColor: 'rgba(20, 21, 26, 0.8)',
-      backdropFilter: 'blur(12px)', // Sticky header blur is acceptable for performance
-      borderBottom: `1px solid ${color.smokeGlassBorder}`,
-      padding: '12px 20px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }}>
-      <div onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-        <Logo size={24} />
-      </div>
-      
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button 
-          onClick={onOpenPricing} 
-          style={btnStyle('pricing')}
-          onPointerDown={() => setIsPressed('pricing')}
-          onPointerUp={() => setIsPressed(null)}
-          onPointerLeave={() => setIsPressed(null)}
-        >
-          Go Premium
-        </button>
-        <button 
-          onClick={() => navigate('/submit')} 
-          style={btnStyle('submit')}
-          onPointerDown={() => setIsPressed('submit')}
-          onPointerUp={() => setIsPressed(null)}
-          onPointerLeave={() => setIsPressed(null)}
-        >
-          Submit Tool
-        </button>
-      </div>
-    </header>
-  );
-}
-
-function BreathingHero() {
-  return (
-    <div style={{ 
-      position: 'relative', 
-      width: '100%', 
-      height: '320px', 
-      overflow: 'hidden', 
-      display: 'flex', 
-      flexDirection: 'column',
-      justifyContent: 'center', 
-      alignItems: 'center' 
-    }}>
-      {/* Ambient breathing blobs */}
-      <div style={{
-        position: 'absolute', width: '180px', height: '180px', background: color.signalTeal, 
-        borderRadius: '50%', filter: 'blur(60px)',
-        animation: 'breathe 8s ease-in-out infinite', zIndex: 1, left: '10%', top: '20%'
-      }} />
-      <div style={{
-        position: 'absolute', width: '140px', height: '140px', background: color.hushLavender, 
-        borderRadius: '50%', filter: 'blur(60px)',
-        animation: 'breathe 8s ease-in-out infinite 2s', zIndex: 1, right: '10%', bottom: '20%'
-      }} />
-      
-      {/* Logo & Title Content */}
-      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 24px' }}>
-        <img 
-          src={LOGO_URL} 
-          alt="Shhh.Space Signal Wave" 
-          style={{ height: '64px', width: 'auto', marginBottom: '16px' }} 
-        />
-        <h1 style={{
-          fontFamily: font.display, fontWeight: 200, fontSize: 'clamp(2rem, 8vw, 3.5rem)',
-          color: color.fogWhite, margin: 0, lineHeight: 1.1, letterSpacing: '-0.02em'
-        }}>
-          Shhh<span style={{ color: color.signalTeal }}>.</span>Space
-        </h1>
-        <p style={{
-          fontFamily: font.body, fontWeight: 300, fontSize: '0.95rem', color: color.fogWhiteMuted,
-          marginTop: '12px', letterSpacing: '0.04em'
-        }}>
-          The directory of secret tools.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ToolCard({ tool }) {
-  const navigate = useNavigate();
-  const [isPressed, setIsPressed] = useState(false);
-  
-  const badge = statusBadge[tool.embedType] || statusBadge.launcher;
-  const access = tool.adGated ? accessTag.adGated : accessTag.free;
-
-  const cardStyle = {
-    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-    backgroundColor: color.mist, 
-    border: `1px solid ${isPressed ? color.signalTeal : 'transparent'}`,
-    borderRadius: radius.card, padding: '20px', cursor: 'pointer',
-    minHeight: '140px', 
-    boxShadow: isPressed ? shadow.cardHover : shadow.card,
-    transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
-    outline: 'none',
-  };
-
-  return (
-    <div 
-      role="button"
-      tabIndex={0}
-      onClick={() => navigate(`/tool/${tool.id}`)}
-      onKeyDown={(e) => e.key === 'Enter' && navigate(`/tool/${tool.id}`)}
-      onPointerDown={() => setIsPressed(true)}
-      onPointerUp={() => setIsPressed(false)}
-      onPointerLeave={() => setIsPressed(false)}
-      style={cardStyle}
-      aria-label={`Open ${tool.name}`}
-    >
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-          <h3 style={{ fontFamily: font.display, color: color.ink, fontSize: '1.2rem', margin: 0, fontWeight: 700 }}>
-            {tool.name}
-          </h3>
-          <span style={{
-            display: 'inline-block', padding: '4px 10px', borderRadius: radius.pill,
-            backgroundColor: badge.bg, color: badge.fg, fontSize: '0.7rem', fontWeight: 600,
-            fontFamily: font.mono, letterSpacing: '0.04em', textTransform: 'uppercase',
-            minWidth: '44px', textAlign: 'center'
-          }}>
-            {badge.label}
-          </span>
-        </div>
-        <p style={{ fontFamily: font.body, color: color.slate, fontSize: '0.9rem', margin: 0, lineHeight: 1.5 }}>
-          {tool.tagline}
-        </p>
-      </div>
-      
-      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontFamily: font.mono, fontSize: '0.75rem', color: access.fg, letterSpacing: '0.05em', fontWeight: 600 }}>
-          {access.label}
-        </span>
-        <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="14" height="14" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 9L9 1M9 1H3M9 1V7" stroke={color.slate} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+      <div style={heroStyle}>
+        <div style={tealBlobStyle} />
+        <div style={lavenderBlobStyle} />
+        <div style={contentStyle}>
+          <h1 style={titleStyle}>
+            Shhh<span style={{ color: color.signalTeal }}>.</span>Space
+          </h1>
+          <p style={subtitleStyle}>
+            A quiet hub for the AI tools worth knowing about — sorted by
+            what you're actually trying to do.
+          </p>
+          <Link to="/submit" style={submitLinkStyle}>
+            + Submit a tool
+          </Link>
         </div>
       </div>
-    </div>
-  );
-}
 
-export default function Home({ onOpenPricing }) {
-  return (
-    <div style={{ backgroundColor: color.duskInk, minHeight: '100vh', color: color.fogWhite, paddingBottom: '60px' }}>
-      <Navbar onOpenPricing={onOpenPricing} />
-      <BreathingHero />
-      
-      <div style={{ padding: '0 20px', maxWidth: '960px', margin: '0 auto' }}>
-        <div style={{ marginBottom: '24px', borderBottom: `1px solid ${color.smokeGlassBorder}`, paddingBottom: '16px' }}>
-          <h2 style={{ fontFamily: font.display, fontSize: '1rem', fontWeight: 400, margin: 0, color: color.fogWhiteMuted }}>
-            Curated Collection
-          </h2>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {categories.map((cat) => (
-            <section key={cat.id}>
-              <h3 style={{ fontFamily: font.mono, color: color.fogWhiteMuted, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
-                {cat.label}
-              </h3>
-              <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                gap: '20px',
-              }}>
-                {cat.tools.map(tool => <ToolCard key={tool.id} tool={tool} />)}
-              </div>
-            </section>
-          ))}
-        </div>
+      <div style={sectionsWrapStyle}>
+        {categories.map((category) => (
+          <CategorySection key={category.id} category={category} />
+        ))}
       </div>
     </div>
   );
