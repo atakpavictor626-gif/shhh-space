@@ -89,7 +89,7 @@ export default function ToolCard({ tool }) {
 
   if (tool.embedType === "launcher") {
     return (
-      
+      <a
         href={tool.url}
         target="_blank"
         rel="noopener noreferrer"
