@@ -3,26 +3,132 @@ import { useNavigate } from 'react-router-dom';
 import { color, font, radius, shadow, statusBadge, accessTag } from '../styles/tokens';
 import { categories } from '../data/categories';
 
+// The provided asset URL
+const LOGO_URL = "https://z-cdn-media.chatglm.cn/files/82fbc0ab-28d1-4082-bdd0-310a550dabd0.png?auth_key=1882618439-128a6150cf2844818a1c390067b289ca-0-c761b14604296def7cc2443e4b1a9d4d";
+
+function Logo({ size = 28 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <img 
+        src={LOGO_URL} 
+        alt="Shhh.Space Logo" 
+        style={{ height: size, width: 'auto' }} 
+      />
+      {size > 24 && (
+        <span style={{
+          fontFamily: font.display,
+          fontWeight: 700,
+          fontSize: '1.1rem',
+          color: color.fogWhite,
+          letterSpacing: '-0.02em'
+        }}>
+          Shhh<span style={{ color: color.signalTeal }}>.</span>Space
+        </span>
+      )}
+    </div>
+  );
+}
+
+function Navbar({ onOpenPricing }) {
+  const navigate = useNavigate();
+  const [isPressed, setIsPressed] = useState(null);
+
+  const btnStyle = (id) => ({
+    background: 'transparent', 
+    border: `1px solid ${isPressed === id ? color.signalTeal : color.smokeGlassBorder}`, 
+    color: isPressed === id ? color.signalTeal : color.fogWhiteMuted,
+    padding: '8px 14px', 
+    borderRadius: radius.pill, 
+    cursor: 'pointer',
+    fontFamily: font.mono, 
+    fontSize: '0.7rem', 
+    letterSpacing: '0.05em',
+    transition: 'border-color 0.2s ease, color 0.2s ease', 
+    minHeight: '44px', 
+    display: 'flex', 
+    alignItems: 'center'
+  });
+
+  return (
+    <header style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 100,
+      backgroundColor: 'rgba(20, 21, 26, 0.8)',
+      backdropFilter: 'blur(12px)', // Sticky header blur is acceptable for performance
+      borderBottom: `1px solid ${color.smokeGlassBorder}`,
+      padding: '12px 20px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    }}>
+      <div onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+        <Logo size={24} />
+      </div>
+      
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button 
+          onClick={onOpenPricing} 
+          style={btnStyle('pricing')}
+          onPointerDown={() => setIsPressed('pricing')}
+          onPointerUp={() => setIsPressed(null)}
+          onPointerLeave={() => setIsPressed(null)}
+        >
+          Go Premium
+        </button>
+        <button 
+          onClick={() => navigate('/submit')} 
+          style={btnStyle('submit')}
+          onPointerDown={() => setIsPressed('submit')}
+          onPointerUp={() => setIsPressed(null)}
+          onPointerLeave={() => setIsPressed(null)}
+        >
+          Submit Tool
+        </button>
+      </div>
+    </header>
+  );
+}
+
 function BreathingHero() {
   return (
-    <div style={{ position: 'relative', width: '100%', height: '260px', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ 
+      position: 'relative', 
+      width: '100%', 
+      height: '320px', 
+      overflow: 'hidden', 
+      display: 'flex', 
+      flexDirection: 'column',
+      justifyContent: 'center', 
+      alignItems: 'center' 
+    }}>
+      {/* Ambient breathing blobs */}
       <div style={{
-        position: 'absolute', width: '180px', height: '180px', background: color.signalTeal, borderRadius: '50%',
-        animation: 'breathe 8s ease-in-out infinite', zIndex: 1, left: '15%', top: '15%'
+        position: 'absolute', width: '180px', height: '180px', background: color.signalTeal, 
+        borderRadius: '50%', filter: 'blur(60px)',
+        animation: 'breathe 8s ease-in-out infinite', zIndex: 1, left: '10%', top: '20%'
       }} />
       <div style={{
-        position: 'absolute', width: '140px', height: '140px', background: color.hushLavender, borderRadius: '50%',
-        animation: 'breathe 8s ease-in-out infinite 2s', zIndex: 1, right: '15%', bottom: '15%'
+        position: 'absolute', width: '140px', height: '140px', background: color.hushLavender, 
+        borderRadius: '50%', filter: 'blur(60px)',
+        animation: 'breathe 8s ease-in-out infinite 2s', zIndex: 1, right: '10%', bottom: '20%'
       }} />
+      
+      {/* Logo & Title Content */}
       <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 24px' }}>
+        <img 
+          src={LOGO_URL} 
+          alt="Shhh.Space Signal Wave" 
+          style={{ height: '64px', width: 'auto', marginBottom: '16px' }} 
+        />
         <h1 style={{
-          fontFamily: font.display, fontWeight: 200, fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+          fontFamily: font.display, fontWeight: 200, fontSize: 'clamp(2rem, 8vw, 3.5rem)',
           color: color.fogWhite, margin: 0, lineHeight: 1.1, letterSpacing: '-0.02em'
         }}>
           Shhh<span style={{ color: color.signalTeal }}>.</span>Space
         </h1>
         <p style={{
-          fontFamily: font.body, fontWeight: 300, fontSize: '1rem', color: color.fogWhiteMuted,
+          fontFamily: font.body, fontWeight: 300, fontSize: '0.95rem', color: color.fogWhiteMuted,
           marginTop: '12px', letterSpacing: '0.04em'
         }}>
           The directory of secret tools.
@@ -39,7 +145,6 @@ function ToolCard({ tool }) {
   const badge = statusBadge[tool.embedType] || statusBadge.launcher;
   const access = tool.adGated ? accessTag.adGated : accessTag.free;
 
-  // Solid mist background for performance. No constant blur or float.
   const cardStyle = {
     display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
     backgroundColor: color.mist, 
@@ -86,9 +191,7 @@ function ToolCard({ tool }) {
         <span style={{ fontFamily: font.mono, fontSize: '0.75rem', color: access.fg, letterSpacing: '0.05em', fontWeight: 600 }}>
           {access.label}
         </span>
-        <div style={{
-          width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
+        <div style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="14" height="14" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1 9L9 1M9 1H3M9 1V7" stroke={color.slate} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
@@ -99,35 +202,16 @@ function ToolCard({ tool }) {
 }
 
 export default function Home({ onOpenPricing }) {
-  const navigate = useNavigate();
-
   return (
     <div style={{ backgroundColor: color.duskInk, minHeight: '100vh', color: color.fogWhite, paddingBottom: '60px' }}>
+      <Navbar onOpenPricing={onOpenPricing} />
       <BreathingHero />
       
       <div style={{ padding: '0 20px', maxWidth: '960px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: `1px solid ${color.smokeGlassBorder}`, paddingBottom: '16px' }}>
+        <div style={{ marginBottom: '24px', borderBottom: `1px solid ${color.smokeGlassBorder}`, paddingBottom: '16px' }}>
           <h2 style={{ fontFamily: font.display, fontSize: '1rem', fontWeight: 400, margin: 0, color: color.fogWhiteMuted }}>
             Curated Collection
           </h2>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button 
-              onClick={onOpenPricing} 
-              style={headerBtnStyle}
-              onMouseEnter={(e) => e.target.style.borderColor = color.hushLavender}
-              onMouseLeave={(e) => e.target.style.borderColor = color.smokeGlassBorder}
-            >
-              Go Premium
-            </button>
-            <button 
-              onClick={() => navigate('/submit')} 
-              style={headerBtnStyle}
-              onMouseEnter={(e) => e.target.style.borderColor = color.signalTeal}
-              onMouseLeave={(e) => e.target.style.borderColor = color.smokeGlassBorder}
-            >
-              Submit Tool
-            </button>
-          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -149,19 +233,3 @@ export default function Home({ onOpenPricing }) {
     </div>
   );
 }
-
-const headerBtnStyle = {
-  background: 'transparent', 
-  border: `1px solid ${color.smokeGlassBorder}`, 
-  color: color.fogWhiteMuted,
-  padding: '10px 16px', 
-  borderRadius: radius.pill, 
-  cursor: 'pointer',
-  fontFamily: font.mono, 
-  fontSize: '0.75rem', 
-  letterSpacing: '0.05em',
-  transition: 'border-color 0.3s ease, color 0.3s ease', 
-  minHeight: '44px', 
-  display: 'flex', 
-  alignItems: 'center'
-};
